@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Grid {
     width: usize,
     height: usize,
@@ -27,10 +27,27 @@ impl Grid {
         row * self.width + col
     }
 
+    fn in_bounds(&self, row: usize, col: usize) -> bool {
+        row < self.height && col < self.width
+    }
+
     pub fn get(&self, row: usize, col: usize) -> Option<bool> {
-        (row < self.height && col < self.width).then(|| self.cells[self.index(row, col)])
+        self.in_bounds(row, col)
+            .then(|| self.cells[self.index(row, col)])
+    }
+
+    pub fn set(&mut self, row: usize, col: usize, alive: bool) -> Result<(), OutOfBounds> {
+        if !self.in_bounds(row, col) {
+            return Err(OutOfBounds);
+        }
+        let index = self.index(row, col);
+        self.cells[index] = alive;
+        Ok(())
     }
 }
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct OutOfBounds;
 
 #[cfg(test)]
 mod tests {
@@ -64,5 +81,29 @@ mod tests {
     fn check_last_valid_cell() {
         let grid = Grid::new(3, 4);
         assert_eq!(grid.get(2, 3), Some(false));
+    }
+
+    #[test]
+    fn set_then_get() {
+        let mut grid = Grid::new(3, 4);
+        grid.set(1, 2, true).unwrap();
+        assert_eq!(grid.get(1, 2), Some(true));
+    }
+
+    #[test]
+    fn set_can_kill() {
+        let mut grid = Grid::new(3, 4);
+        grid.set(0, 0, true).unwrap();
+        grid.set(0, 0, false).unwrap();
+        assert_eq!(grid.get(0, 0), Some(false));
+    }
+
+    #[test]
+    fn set_out_of_bounds_error() {
+        let mut grid = Grid::new(3, 4);
+        let before = grid.clone();
+        assert_eq!(grid.set(3, 0, true), Err(OutOfBounds));
+        assert_eq!(grid.set(0, 4, true), Err(OutOfBounds));
+        assert_eq!(grid, before);
     }
 }

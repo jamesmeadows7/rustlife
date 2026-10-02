@@ -44,6 +44,23 @@ impl Grid {
         self.cells[index] = alive;
         Ok(())
     }
+
+    fn live_neighbours(&self, row: usize, col: usize) -> u8 {
+        let mut count = 0;
+        for row_offset in [self.height - 1, 0, 1] {
+            for col_offset in [self.width - 1, 0, 1] {
+                if row_offset == 0 && col_offset == 0 {
+                    continue;
+                }
+                let neighbour_row = (row + row_offset) % self.height;
+                let neighbour_col = (col + col_offset) % self.width;
+                if self.cells[self.index(neighbour_row, neighbour_col)] {
+                    count += 1;
+                }
+            }
+        }
+        count
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -52,6 +69,23 @@ pub struct OutOfBounds;
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn grid_from(rows: &[&str]) -> Grid {
+        let height = rows.len();
+        let width = rows[0].chars().count();
+        let mut grid = Grid::new(height, width);
+        for (row, line) in rows.iter().enumerate() {
+            assert_eq!(line.chars().count(), width);
+            for (col, c) in line.chars().enumerate() {
+                match c {
+                    '#' => grid.set(row, col, true).unwrap(),
+                    '.' => {}
+                    _ => panic!("unexpected character {c:?} at ({row}, {col})"),
+                }
+            }
+        }
+        grid
+    }
 
     #[test]
     fn new_grid_has_correct_dimensions() {
@@ -105,5 +139,39 @@ mod tests {
         assert_eq!(grid.set(3, 0, true), Err(OutOfBounds));
         assert_eq!(grid.set(0, 4, true), Err(OutOfBounds));
         assert_eq!(grid, before);
+    }
+
+    #[test]
+    fn lone_cell_has_zero_neighbours() {
+        let mut grid = Grid::new(5, 5);
+        grid.set(2, 2, true).unwrap();
+        assert_eq!(grid.live_neighbours(2, 2), 0);
+    }
+
+    #[test]
+    fn surrounded_cell_has_eight_neighbours() {
+        let grid = grid_from(&[".....", ".###.", ".###.", ".###.", "....."]);
+        assert_eq!(grid.live_neighbours(2, 2), 8);
+    }
+
+    #[test]
+    fn horizontal_wrapping() {
+        let mut grid = Grid::new(5, 5);
+        grid.set(0, 4, true).unwrap();
+        assert_eq!(grid.live_neighbours(0, 0), 1);
+    }
+
+    #[test]
+    fn diagonal_wrapping() {
+        let mut grid = Grid::new(5, 5);
+        grid.set(4, 4, true).unwrap();
+        assert_eq!(grid.live_neighbours(0, 0), 1);
+    }
+
+    #[test]
+    fn non_square_grid() {
+        let mut grid = Grid::new(3, 5);
+        grid.set(0, 4, true).unwrap();
+        assert_eq!(grid.live_neighbours(0, 0), 1);
     }
 }

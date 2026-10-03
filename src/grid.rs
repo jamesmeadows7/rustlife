@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{error::Error, fmt};
 
 #[derive(Clone, Eq, PartialEq)]
 pub struct Grid {
@@ -40,7 +40,7 @@ impl Grid {
 
     pub fn set(&mut self, row: usize, col: usize, alive: bool) -> Result<(), OutOfBounds> {
         if !self.in_bounds(row, col) {
-            return Err(OutOfBounds);
+            return Err(OutOfBounds { row, col });
         }
         let index = self.index(row, col);
         self.cells[index] = alive;
@@ -98,7 +98,18 @@ impl fmt::Debug for Grid {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct OutOfBounds;
+pub struct OutOfBounds {
+    pub row: usize,
+    pub col: usize,
+}
+
+impl fmt::Display for OutOfBounds {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "cell ({}, {}) is out of bounds", self.row, self.col)
+    }
+}
+
+impl Error for OutOfBounds {}
 
 #[cfg(test)]
 mod tests {
@@ -170,9 +181,15 @@ mod tests {
     fn set_out_of_bounds_error() {
         let mut grid = Grid::new(3, 4);
         let before = grid.clone();
-        assert_eq!(grid.set(3, 0, true), Err(OutOfBounds));
-        assert_eq!(grid.set(0, 4, true), Err(OutOfBounds));
+        assert_eq!(grid.set(3, 0, true), Err(OutOfBounds { row: 3, col: 0 }));
+        assert_eq!(grid.set(0, 4, true), Err(OutOfBounds { row: 0, col: 4 }));
         assert_eq!(grid, before);
+    }
+
+    #[test]
+    fn out_of_bounds_message() {
+        let err = OutOfBounds { row: 3, col: 0 };
+        assert_eq!(err.to_string(), "cell (3, 0) is out of bounds");
     }
 
     #[test]

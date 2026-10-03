@@ -1,5 +1,3 @@
-from rustlife._core import hello_from_bin
+from rustlife._core import Life
 
-
-def hello() -> str:
-    return hello_from_bin()
+__all__ = ["Life"]

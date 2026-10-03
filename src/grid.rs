@@ -1,4 +1,6 @@
-#[derive(Clone, Debug, Eq, PartialEq)]
+use std::fmt;
+
+#[derive(Clone, Eq, PartialEq)]
 pub struct Grid {
     width: usize,
     height: usize,
@@ -60,6 +62,38 @@ impl Grid {
             }
         }
         count
+    }
+
+    #[must_use = "step returns the next generation; it does not modify the grid"]
+    pub fn step(&self) -> Self {
+        let mut next = Self::new(self.height, self.width);
+        for row in 0..self.height {
+            for col in 0..self.width {
+                let alive = self.cells[self.index(row, col)];
+                let n = self.live_neighbours(row, col);
+                match (alive, n) {
+                    (true, 2 | 3) | (false, 3) => {
+                        let index = next.index(row, col);
+                        next.cells[index] = true;
+                    }
+                    _ => {}
+                }
+            }
+        }
+        next
+    }
+}
+
+impl fmt::Debug for Grid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "Grid {}x{}", self.height, self.width)?;
+        for row in self.cells.chunks(self.width) {
+            for alive in row {
+                write!(f, "{}", if *alive { '#' } else { '.' })?;
+            }
+            writeln!(f)?;
+        }
+        Ok(())
     }
 }
 
@@ -173,5 +207,37 @@ mod tests {
         let mut grid = Grid::new(3, 5);
         grid.set(0, 4, true).unwrap();
         assert_eq!(grid.live_neighbours(0, 0), 1);
+    }
+
+    #[test]
+    fn block_is_stable() {
+        let grid = grid_from(&["....", ".##.", ".##.", "...."]);
+        assert_eq!(grid.step(), grid);
+    }
+
+    #[test]
+    fn blinker_oscillates() {
+        let grid = grid_from(&[".....", ".....", ".###.", ".....", "....."]);
+        let expected = grid_from(&[".....", "..#..", "..#..", "..#..", "....."]);
+        let next = grid.step();
+        assert_eq!(next, expected);
+        assert_eq!(next.step(), grid);
+    }
+
+    #[test]
+    fn glider_moves() {
+        let grid = grid_from(&[".#...", "..#..", "###..", ".....", "....."]);
+        let expected = grid_from(&[".....", "..#..", "...#.", ".###.", "....."]);
+        assert_eq!(grid.step().step().step().step(), expected)
+    }
+
+    #[test]
+    fn glider_wraps_around() {
+        let start = grid_from(&[".#...", "..#..", "###..", ".....", "....."]);
+        let mut grid = start.clone();
+        for _ in 0..20 {
+            grid = grid.step();
+        }
+        assert_eq!(grid, start);
     }
 }

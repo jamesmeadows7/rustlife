@@ -54,6 +54,14 @@ impl Life {
     fn get(&self, row: usize, col: usize) -> PyResult<bool> {
         Ok(self.grid.get(row, col).ok_or(OutOfBounds { row, col })?)
     }
+
+    /// Advance the simulation by n generations, in place.
+    #[pyo3(signature = (n = 1))]
+    fn step(&mut self, n: usize) {
+        for _ in 0..n {
+            self.grid = self.grid.step();
+        }
+    }
 }
 
 impl From<OutOfBounds> for PyErr {

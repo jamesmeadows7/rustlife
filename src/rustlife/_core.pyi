@@ -12,3 +12,5 @@ class Life:
     def get(self, row: int, col: int) -> bool:
         """Return whether the cell is alive. Raises IndexError if out of range"""
     def set(self, row: int, col: int, alive: bool) -> None: ...
+    def step(self, n: int = 1) -> None:
+        """Advance the simulation by n generations, in place."""

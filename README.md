@@ -1,16 +1,36 @@
 # rustlife
 
-A Python library for Conway's Game of Life with a Rust backend. Built with [PyO3](https://pyo3.rs/v0.28.3/getting-started) and [maturin](https://www.maturin.rs).
+A small Python library for Conway's Game of Life with a Rust backend, written as a project to learn how to build Python extensions in Rust with [PyO3](https://pyo3.rs/v0.28.3/getting-started) and [maturin](https://www.maturin.rs).
+
+![A glider crossing the grid and wrapping around the edges](assets/glider.gif)
+
+See [`examples/animate.py`](examples/animate.py) for a live matplotlib animation.
 
 ```python
 from rustlife import Life
 
 life = Life(5, 5)
-life.set(2, 1, True)
-life.set(2, 2, True)
-life.set(2, 3, True)
+for col in (1, 2, 3):
+    life.set(2, col, True)
+
 life.step()
 print(life)
+```
+
+```
+.....
+..#..
+..#..
+..#..
+.....
+```
+
+## Running It
+
+```bash
+cargo test                          # rust tests
+uv run pytest                       # python tests
+uv run python examples/animate.py   # matplotlib animation
 ```
 
 ## How It Works

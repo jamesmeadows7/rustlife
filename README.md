@@ -25,12 +25,15 @@ print(life)
 .....
 ```
 
+On a 200×200 grid, the Rust backend is about 130× faster than an equivalent pure-Python implementation (see [`bench/bench.py`](bench/bench.py)).
+
 ## Running It
 
 ```bash
 cargo test                          # rust tests
 uv run pytest                       # python tests
 uv run python examples/animate.py   # matplotlib animation
+uv run python bench/bench.py        # benchmark against pure Python
 ```
 
 ## How It Works

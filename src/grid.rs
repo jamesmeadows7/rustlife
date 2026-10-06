@@ -49,6 +49,7 @@ impl Grid {
 
     fn live_neighbours(&self, row: usize, col: usize) -> u8 {
         let mut count = 0;
+        // On grids smaller than 3x3, different offsets wrap to the same cell, so neighbours are double counted
         for row_offset in [self.height - 1, 0, 1] {
             for col_offset in [self.width - 1, 0, 1] {
                 if row_offset == 0 && col_offset == 0 {

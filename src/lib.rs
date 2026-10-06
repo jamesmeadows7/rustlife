@@ -16,12 +16,17 @@ impl Life {
     #[classattr]
     const MAX_CELLS: usize = 100_000_000;
 
+    /// Smallest allowed height and width.
+    #[classattr]
+    const MIN_SIZE: usize = 3;
+
     /// Create an all-dead grid, validating the dimensions.
     #[new]
     fn new(height: usize, width: usize) -> PyResult<Self> {
-        if height == 0 || width == 0 {
+        if height < Self::MIN_SIZE || width < Self::MIN_SIZE {
             return Err(PyValueError::new_err(format!(
-                "grid dimensions must be positive, got {height}x{width}"
+                "grid dimensions must be at least {min}x{min}, got {height}x{width}",
+                min = Self::MIN_SIZE
             )));
         }
         match height.checked_mul(width) {

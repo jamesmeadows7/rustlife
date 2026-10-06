@@ -25,7 +25,7 @@ class TestConstruction:
     def test_new_grid_is_all_dead(self, life: Life):
         assert life.to_list() == [[False] * 4] * 3
 
-    @pytest.mark.parametrize("height, width", [(0, 5), (5, 0), (2**40, 2**40)])
+    @pytest.mark.parametrize("height, width", [(2, 5), (5, 2), (1, 6), (2**40, 2**40)])
     def test_invalid_dimensions_raise(self, height, width):
         with pytest.raises(ValueError):
             Life(height, width)
@@ -35,10 +35,16 @@ class TestConstruction:
             Life(-3, -4)
 
     def test_max_cells_boundary(self):
-        life = Life(1, Life.MAX_CELLS)
-        assert life.width == Life.MAX_CELLS
+        life = Life(100, Life.MAX_CELLS // 100)
+        assert life.width == Life.MAX_CELLS // 100
         with pytest.raises(ValueError, match="maximum"):
-            Life(1, Life.MAX_CELLS + 1)
+            Life(100, Life.MAX_CELLS // 100 + 1)
+
+    def test_min_size_boundary(self):
+        life = Life(Life.MIN_SIZE, Life.MIN_SIZE)
+        assert life.width == Life.MIN_SIZE
+        with pytest.raises(ValueError, match="at least"):
+            Life(Life.MIN_SIZE - 1, Life.MIN_SIZE - 1)
 
 
 class TestGetSet:
@@ -94,7 +100,7 @@ class TestConversions:
 
     def test_from_list_ragged_rows_raise(self):
         with pytest.raises(ValueError, match="row 1"):
-            Life.from_list([[True, False], [True]])
+            Life.from_list([[True, False, True], [True], [False, True, False]])
 
     @pytest.mark.parametrize("rows", [[], [[]]])
     def test_from_list_empty_raises(self, rows):

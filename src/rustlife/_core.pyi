@@ -5,6 +5,8 @@ class Life:
 
     MAX_CELLS: Final[int]
     """Maximum number of cells (height x width)."""
+    MIN_SIZE: Final[int]
+    """Smallest allowed height and width."""
     def __init__(self, height: int, width: int) -> None:
         """Create an all-dead grid, validating the dimensions."""
     @property

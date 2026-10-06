@@ -67,6 +67,14 @@ impl Life {
             self.grid = self.grid.step();
         }
     }
+
+    fn __str__(&self) -> String {
+        self.grid.to_string()
+    }
+
+    fn __repr__(&self) -> String {
+        format!("<Life {}x{}>", self.grid.height(), self.grid.width())
+    }
 }
 
 impl From<OutOfBounds> for PyErr {

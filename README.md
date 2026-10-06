@@ -10,6 +10,7 @@ life.set(2, 1, True)
 life.set(2, 2, True)
 life.set(2, 3, True)
 life.step()
+print(life)
 ```
 
 ## How It Works

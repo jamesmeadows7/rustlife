@@ -84,16 +84,24 @@ impl Grid {
     }
 }
 
-impl fmt::Debug for Grid {
+impl fmt::Display for Grid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "Grid {}x{}", self.height, self.width)?;
-        for row in self.cells.chunks(self.width) {
+        for (i, row) in self.cells.chunks(self.width).enumerate() {
+            if i > 0 {
+                writeln!(f)?;
+            }
             for alive in row {
                 write!(f, "{}", if *alive { '#' } else { '.' })?;
             }
-            writeln!(f)?;
         }
         Ok(())
+    }
+}
+
+impl fmt::Debug for Grid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "Grid {}x{}", self.height, self.width)?;
+        write!(f, "{self}")
     }
 }
 

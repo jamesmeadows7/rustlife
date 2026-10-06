@@ -1,8 +1,10 @@
 [project]
 name = "rustlife"
 version = "0.1.0"
-description = "Add your description here"
+description = "Conway's Game of Life with a Rust backend, built with PyO3 and maturin"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     { name = "jamesmeadows7", email = "james.w.meadows@durham.ac.uk" }
 ]

@@ -75,6 +75,11 @@ impl Life {
     fn __repr__(&self) -> String {
         format!("<Life {}x{}>", self.grid.height(), self.grid.width())
     }
+
+    /// Return the grid as a list of rows, each a list of bools (True = alive).
+    fn to_list(&self) -> Vec<Vec<bool>> {
+        self.grid.to_rows()
+    }
 }
 
 impl From<OutOfBounds> for PyErr {

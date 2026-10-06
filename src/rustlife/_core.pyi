@@ -19,3 +19,5 @@ class Life:
         """Return True if the cell at (row, col) is alive. Raises IndexError if (row, col) is outside of grid."""
     def step(self, n: int = 1) -> None:
         """Advance the simulation by n generations, in place."""
+    def to_list(self) -> list[list[bool]]:
+        """Return the grid as a list of rows, each a list of bools (True = alive)."""

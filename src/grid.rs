@@ -82,6 +82,13 @@ impl Grid {
         }
         next
     }
+
+    pub fn to_rows(&self) -> Vec<Vec<bool>> {
+        self.cells
+            .chunks(self.width)
+            .map(|row| row.to_vec())
+            .collect()
+    }
 }
 
 impl fmt::Display for Grid {
@@ -264,5 +271,13 @@ mod tests {
             grid = grid.step();
         }
         assert_eq!(grid, start);
+    }
+
+    #[test]
+    fn to_rows_returns_rows_in_order() {
+        assert_eq!(
+            grid_from(&["#.", ".#"]).to_rows(),
+            vec![vec![true, false], vec![false, true]]
+        );
     }
 }

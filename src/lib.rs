@@ -80,6 +80,28 @@ impl Life {
     fn to_list(&self) -> Vec<Vec<bool>> {
         self.grid.to_rows()
     }
+
+    /// Create a grid from a list of rows, each a list of bools (True = alive). Raises ValueError if the rows differ in length or the size is invalid.
+    #[staticmethod]
+    fn from_list(rows: Vec<Vec<bool>>) -> PyResult<Self> {
+        let height = rows.len();
+        let width = rows.first().map_or(0, |row| row.len());
+        let mut life = Self::new(height, width)?;
+        for (row, cells) in rows.iter().enumerate() {
+            if cells.len() != width {
+                return Err(PyValueError::new_err(format!(
+                    "row {row} has length {}, expected {width}",
+                    cells.len()
+                )));
+            }
+            for (col, &alive) in cells.iter().enumerate() {
+                if alive {
+                    life.grid.set(row, col, true)?;
+                }
+            }
+        }
+        Ok(life)
+    }
 }
 
 impl From<OutOfBounds> for PyErr {

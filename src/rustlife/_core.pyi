@@ -21,3 +21,6 @@ class Life:
         """Advance the simulation by n generations, in place."""
     def to_list(self) -> list[list[bool]]:
         """Return the grid as a list of rows, each a list of bools (True = alive)."""
+    @staticmethod
+    def from_list(rows: list[list[bool]]) -> Life:
+        """Create a grid from a list of rows, each a list of bools (True = alive). Raises ValueError if the rows differ in length or the size is invalid."""
